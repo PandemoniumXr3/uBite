@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>uPlate – ARFID-Friendly Food Planner</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- SECTION: App Shell -->
+    <div class="app-shell gradient-mesh grain">
+      <!-- SECTION: Header -->
+      <header class="app-header">
+        <div class="header-main">
+          <div>
+            <h1 class="app-title">CalmPlate</h1>
+            <p class="app-subtitle">A personal ARFID food tracking app with food safety categories, meal planning, and exposure challenges.</p>
+          </div>
+          <div class="header-toggles">
+            <label class="toggle">
+              <input type="checkbox" id="kcal-toggle" />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Show kcal</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="time-suggestion-toggle" />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Time-based tips</span>
+            </label>
+          </div>
+        </div>
+        <div class="header-filters">
+          <label class="pill-checkbox">
+            <input type="checkbox" id="no-dairy-filter" />
+            <span>No dairy</span>
+          </label>
+           <label class="pill-checkbox">
+             <input type="checkbox" id="protein-filter" />
+             <span>Protein focus</span>
+           </label>
+          <label class="pill-checkbox">
+            <input type="checkbox" id="in-stock-filter" />
+            <span>Only in stock</span>
+          </label>
+        </div>
+      </header>
+
+      <!-- SECTION: Suggestion Banner -->
+      <section class="suggestion-banner" aria-live="polite">
+        <div class="suggestion-text">
+          <h2 class="suggestion-title">Feeling stuck?</h2>
+          <p id="suggestion-output">Press the button and I'll suggest something gentle to eat.</p>
+        </div>
+        <div class="suggestion-actions">
+          <select id="suggestion-meal-type" class="input select">
+            <option value="auto">Any time</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+            <option value="snack">Snack</option>
+          </select>
+          <button id="suggest-btn" class="btn btn-primary">Suggest something to eat</button>
+        </div>
+      </section>
+
+      <!-- SECTION: Tabs -->
+      <main class="tabs-container">
+        <!-- Home Tab -->
+        <section class="tab-panel" id="tab-home" aria-label="Home" data-tab="home">
+          <h2 class="tab-heading">Today</h2>
+          <div class="home-grid">
+            <article class="card shadow-soft">
+              <h3 class="card-title">Today at a glance</h3>
+              <div class="summary-metrics" id="today-summary">
+                <!-- Populated by JS -->
+              </div>
+            </article>
+
+            <article class="card shadow-soft">
+              <h3 class="card-title">Quick add</h3>
+              <div class="quick-actions">
+                <button class="btn btn-secondary" id="quick-add-meal">Add Meal</button>
+                <button class="btn btn-ghost" id="quick-add-food">Add Food</button>
+              </div>
+              <form class="stacked-form" id="quick-meal-form">
+                <label for="quick-meal-name">Meal name</label>
+                <input id="quick-meal-name" class="input" type="text" placeholder="e.g. Toastie + mango smoothie" />
+
+                <label for="quick-meal-time">When</label>
+                <select id="quick-meal-time" class="input select">
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                  <option value="snack">Snack</option>
+                </select>
+
+                <label for="quick-meal-notes">Notes (optional)</label>
+                <textarea id="quick-meal-notes" class="input textarea" rows="2" placeholder="How it felt, anything to remember"></textarea>
+
+                <button type="submit" class="btn btn-primary full-width">Save meal</button>
+              </form>
+            </article>
+
+            <article class="card shadow-soft">
+              <h3 class="card-title">Today’s meals</h3>
+              <ul id="today-meals-list" class="list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Foods Tab -->
+        <section class="tab-panel is-hidden" id="tab-foods" aria-label="Foods" data-tab="foods">
+           <h2 class="tab-heading">Safe foods</h2>
+           <article class="card shadow-soft">
+             <h3 class="card-title">Log a food</h3>
+             <form class="stacked-form" id="food-form">
+              <label for="food-name">Name</label>
+              <input id="food-name" class="input" type="text" placeholder="e.g. Alpro vanilla yoghurt" required />
+
+               <label for="food-safety">How does this food feel?</label>
+               <select id="food-safety" class="input select">
+                 <option value="safe">Safe</option>
+                 <option value="mostly-safe">Mostly safe</option>
+                 <option value="neutral">Neutral</option>
+                 <option value="can-eat">Can eat if needed</option>
+                 <option value="want-to-try">Want to try</option>
+                 <option value="scared-to-try">Scared to try</option>
+                 <option value="never-tried">Never tried</option>
+                 <option value="dislike">Dislike</option>
+                 <option value="cant-eat">Can't eat</option>
+               </select>
+
+              <div class="inline-fields">
+                <label class="checkbox">
+                  <input type="checkbox" id="food-no-dairy" />
+                  <span>Dairy-free</span>
+                </label>
+                 <label class="checkbox">
+                   <input type="checkbox" id="food-protein" />
+                   <span>High protein</span>
+                 </label>
+                <label class="checkbox">
+                  <input type="checkbox" id="food-takeout" />
+                  <span>Takeout / restaurant</span>
+                </label>
+              </div>
+
+              <label for="food-kcal">kcal (optional)</label>
+              <input id="food-kcal" class="input" type="number" min="0" step="1" placeholder="e.g. 320" />
+
+               <label for="food-notes">Sensory notes & tolerance</label>
+               <textarea id="food-notes" class="input textarea" rows="2" placeholder="Texture, smell, brand, portion size, what makes it feel okay"></textarea>
+
+              <label for="food-stock">In stock</label>
+              <input id="food-stock" class="input" type="number" min="0" step="1" value="0" />
+
+               <button type="submit" class="btn btn-primary full-width">Save safe food</button>
+            </form>
+          </article>
+
+          <article class="card shadow-soft">
+             <div class="card-header-row">
+               <h3 class="card-title">All safe foods</h3>
+               <input id="food-search" class="input search" type="search" placeholder="Search your foods" />
+             </div>
+             <div class="chip-row" id="safety-filter-chips">
+               <button class="chip is-active" data-safety="all">All</button>
+               <button class="chip" data-safety="safe">Safe</button>
+               <button class="chip" data-safety="mostly-safe">Mostly safe</button>
+               <button class="chip" data-safety="neutral">Neutral</button>
+               <button class="chip" data-safety="can-eat">Can eat</button>
+               <button class="chip" data-safety="want-to-try">Want to try</button>
+               <button class="chip" data-safety="scared-to-try">Scared to try</button>
+               <button class="chip" data-safety="never-tried">Never tried</button>
+               <button class="chip" data-safety="dislike">Dislike</button>
+               <button class="chip" data-safety="cant-eat">Can't eat</button>
+             </div>
+             <ul id="foods-list" class="list list-foods"></ul>
+          </article>
+        </section>
+
+          <!-- Plan Tab -->
+          <section class="tab-panel" id="tab-plan" aria-label="Plan" data-tab="plan">
+            <h2 class="tab-heading">Weekly plan</h2>
+
+            <article class="card shadow-soft">
+              <div class="plan-header-row">
+                <h3 class="card-title">This week</h3>
+                <div id="week-day-strip" class="week-day-strip" aria-label="Select day of week">
+                  <!-- JS: 7 day buttons -->
+                </div>
+              </div>
+
+              <div id="day-plan" class="day-plan">
+                <!-- JS: vertical slots for selected day -->
+              </div>
+
+              <button id="add-recipe-btn" class="btn btn-secondary full-width" style="margin-top: 12px;">Add recipes</button>
+            </article>
+
+            <article class="card shadow-soft">
+              <h3 class="card-title">Recipe / meal for slot</h3>
+              <form class="stacked-form" id="plan-form">
+                <label for="plan-day-select">Day</label>
+                <select id="plan-day-select" class="input select"></select>
+
+                <label for="plan-slot-select">Meal slot</label>
+                <select id="plan-slot-select" class="input select">
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                  <option value="snack">Snack</option>
+                  <option value="snack2">Snack 2 / drink</option>
+                </select>
+
+                <label for="plan-food-select">Safe food / recipe</label>
+                <select id="plan-food-select" class="input select">
+                  <!-- Populated from foods -->
+                </select>
+
+                <label for="plan-notes">Notes (optional)</label>
+                <textarea id="plan-notes" class="input textarea" rows="2" placeholder="Copy-paste recipe, portion, backup meal"></textarea>
+
+                <button type="submit" class="btn btn-primary full-width">Save to plan</button>
+              </form>
+            </article>
+          </section>
+
+        <!-- Challenges Tab -->
+        <section class="tab-panel is-hidden" id="tab-challenges" aria-label="Challenges" data-tab="challenges">
+          <h2 class="tab-heading">Challenges</h2>
+          <article class="card shadow-soft">
+            <h3 class="card-title">New challenge</h3>
+            <form class="stacked-form" id="challenge-form">
+              <label for="challenge-title">Challenge name</label>
+              <input id="challenge-title" class="input" type="text" placeholder="e.g. Try 1 bite of veggie gyoza" />
+
+              <label for="challenge-food">Related food (optional)</label>
+              <select id="challenge-food" class="input select">
+                <!-- From foods -->
+              </select>
+
+              <label for="challenge-steps">Steps (optional)</label>
+              <textarea id="challenge-steps" class="input textarea" rows="2" placeholder="e.g. Look at it, smell it, small bite with safe drink"></textarea>
+
+              <button type="submit" class="btn btn-primary full-width">Save challenge</button>
+            </form>
+          </article>
+
+          <article class="card shadow-soft">
+            <h3 class="card-title">Active challenges</h3>
+            <ul id="challenges-list" class="list"></ul>
+          </article>
+        </section>
+      </main>
+
+      <!-- SECTION: Bottom Navigation -->
+      <nav class="bottom-nav" aria-label="Main navigation">
+        <button class="nav-item is-active" data-tab-target="home">
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" data-tab-target="foods">
+          <span class="nav-label">Foods</span>
+        </button>
+        <button class="nav-item" data-tab-target="plan">
+          <span class="nav-label">Plan</span>
+        </button>
+        <button class="nav-item" data-tab-target="challenges">
+          <span class="nav-label">Challenges</span>
+        </button>
+      </nav>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
